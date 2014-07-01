@@ -1,8 +1,10 @@
 module.exports = function(grunt) {
-    var files = ['src/**/*.js', 'test/**/*.js'];
+    var jsFiles = ['src/**/*.js', 'test/**/*.js'];
+    var dependencies = ['node_modules/lodash/lodash.js',
+                        'node_modules/jquery/dist/jquery.js'];
     grunt.initConfig({
         jshint: {
-            all: files,
+            all: jsFiles,
             options: {
                 globals: {
                     _: false,
@@ -23,8 +25,8 @@ module.exports = function(grunt) {
                     framework: 'jasmine2',
                     launch_in_dev: ['PhantomJS'],
                     before_tests: 'grunt jshint',
-                    serve_files: files,
-                    watch_files: files
+                    serve_files: jsFiles.concat(dependencies),
+                    watch_files: jsFiles
                 }
             }
         }
@@ -32,5 +34,7 @@ module.exports = function(grunt) {
 
     grunt.loadNpmTasks('grunt-contrib-jshint');
     grunt.loadNpmTasks('grunt-contrib-testem');
+
+    grunt.registerTask('default', ['testem:run:unit']);
 
 };
