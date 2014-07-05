@@ -101,6 +101,40 @@ describe('Scope', function(){
       expect(watchFn).toHaveBeenCalled();
     });
 
+    it('triggers chained watchers in the same digest', function () {
+      scope.name = 'Jane';
+
+      // if these watchers where in the opposite order,
+      // the test would pass regardless of chaining.
+      scope.$watch(
+        function(scope) {return scope.nameUpper; },
+        function(newValue, oldValue, scope){
+          if (newValue) {
+            scope.initial = newValue.substring(0,1) + '.';
+          }
+        }
+      );
+
+      scope.$watch(
+        function(scope){ return scope.name; },
+        function(newValue, oldValue, scope) {
+          if (newValue) {
+            scope.nameUpper = newValue.toUpperCase();
+          }
+        }
+      );
+
+      scope.$digest();
+      expect(scope.nameUpper).toBe('JANE');
+      expect(scope.initial).toBe('J.');
+
+      scope.name = 'Bob';
+      scope.$digest();
+      expect(scope.nameUpper).toBe('BOB');
+      expect(scope.initial).toBe('B.');
+
+    });
+
   });
 
 });
