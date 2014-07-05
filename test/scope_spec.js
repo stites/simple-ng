@@ -92,6 +92,15 @@ describe("Scope", function(){
 
     });
 
+    it('may have watchers that omit the listener function', function () {
+      var watchFn = jasmine.createSpy().and.returnValue('something');
+      scope.$watch(watchFn);
+
+      scope.$digest();
+
+      expect(watchFn).toHaveBeenCalled();
+    });
+
   });
 
 });
