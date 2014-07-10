@@ -89,7 +89,6 @@ describe('Scope', function(){
 
       scope.$digest();
       expect(oldValueGiven).toBe(123);
-
     });
 
     it('may have watchers that omit the listener function', function () {
@@ -235,7 +234,24 @@ describe('Scope', function(){
       scope.$digest();
       expect(scope.counter).toBe(1);
     });
+  });
 
+  describe('eval', function () {
+    var scope;
+
+    beforeEach(function(){
+      scope = new Scope();
+    });
+
+    it('executes $eval\'ed function and returns result', function () {
+      scope.aValue = 42;
+
+      var result = scope.$eval(function(scope){
+        return scope.aValue;
+      });
+
+      expect(result).toBe(42);
+    });
   });
 
 });
