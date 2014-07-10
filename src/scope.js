@@ -71,6 +71,9 @@ Scope.prototype.$eval = function(expr, locals) {
 };
 
 Scope.prototype.$apply = function(expr) {
-  this.$eval(expr);
-  this.$digest();
+  try {
+    return this.$eval(expr);
+  } finally {
+    this.$digest();
+  }
 };
