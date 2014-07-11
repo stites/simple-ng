@@ -48,15 +48,15 @@ Scope.prototype.$digest = function(){
   var dirty;
   this.$$lastDirtyWatch = null;
   do {
-    dirty = this.$$digestOnce();
     while (this.$$asyncQueue.length) {
       var asyncTask = this.$$asyncQueue.shift();
       asyncTask.scope.$eval(asyncTask.expression);
     }
+    dirty = this.$$digestOnce();
     if (dirty && !(ttl--)) {
       throw '10 digest iterations reached';
     }
-  } while (dirty);
+  } while (dirty || this.$$asyncQueue.length);
 };
 
 Scope.prototype.$$areEqual = function(newValue, oldValue, valueEq) {
