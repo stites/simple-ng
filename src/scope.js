@@ -12,14 +12,19 @@ function Scope() {
 }
 
 Scope.prototype.$watch = function(watchFn, listenerFn, valueEq) {
+  var self = this;
   var watcher = {
     watchFn: watchFn,
     listenerFn: listenerFn || function(){},
     valueEq: !!valueEq,
     last: initWatchVal
   };
-  this.$$watchers.push(watcher);
-  this.$$lastDirtyWatch = null;
+  var idx = self.$$watchers.length;
+  self.$$watchers.push(watcher);
+  self.$$lastDirtyWatch = null;
+  return function(){
+    delete self.$$watchers[idx];
+  };
 };
 
 Scope.prototype.$$digestOnce = function(){
