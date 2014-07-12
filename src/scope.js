@@ -19,11 +19,13 @@ Scope.prototype.$watch = function(watchFn, listenerFn, valueEq) {
     valueEq: !!valueEq,
     last: initWatchVal
   };
-  var idx = self.$$watchers.length;
   self.$$watchers.push(watcher);
   self.$$lastDirtyWatch = null;
   return function(){
-    delete self.$$watchers[idx];
+    var index = self.$$watchers.indexOf(watcher);
+    if ( index >=0 ) {
+      self.$$watchers.splice(index, 1);
+    }
   };
 };
 
