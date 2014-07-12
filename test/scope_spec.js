@@ -546,6 +546,33 @@ describe('Scope', function(){
       scope.$digest();
       expect(scope.counter).toBe(2);
     });
+
+    it('allows destroying a $watch during a digest', function () {
+      scope.aValue = 'abc';
+      var watchCalls = [];
+
+      scope.$watch(
+        function(scope){
+          watchCalls.push('first');
+          return scope.aValue;
+        }
+      );
+      var destroyWatch = scope.$watch(
+        function(scope) {
+          watchCalls.push('second');
+          destroyWatch();
+        }
+      );
+      scope.$watch(
+        function(scope){
+          watchCalls.push('third');
+          return scope.aValue;
+        }
+      );
+
+      scope.$digest();
+      expect(watchCalls).toEqual(['first', 'second', 'third', 'first', 'third']);
+    });
   });
 
 
