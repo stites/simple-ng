@@ -72,7 +72,11 @@ Scope.prototype.$digest = function(){
   this.$clearPhase();
 
   while (this.$$postDigestQueue.length){
-    this.$$postDigestQueue.shift()();
+    try {
+      this.$$postDigestQueue.shift()();
+    } catch (e) {
+      console.error(e);
+    }
   }
 };
 
