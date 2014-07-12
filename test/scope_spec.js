@@ -4,19 +4,19 @@
 
 describe('Scope', function(){
 
+  var scope;
+
+  beforeEach(function(){
+    scope = new Scope();
+  });
+
   it('can be constructed and used as an object', function(){
-    var scope = new Scope();
     scope.aProperty = 1;
 
     expect(scope.aProperty).toBe(1);
   });
 
   describe('digest', function(){
-    var scope;
-
-    beforeEach(function(){
-      scope = new Scope();
-    });
 
     it('calls the listener function of a watch on first $digest', function(){
       var watchFn = function(){ return 'wat'; };
@@ -237,11 +237,6 @@ describe('Scope', function(){
   });
 
   describe('eval', function () {
-    var scope;
-
-    beforeEach(function(){
-      scope = new Scope();
-    });
 
     it('executes $eval\'ed function and returns result', function () {
       scope.aValue = 42;
@@ -265,11 +260,6 @@ describe('Scope', function(){
   });
 
   describe('apply', function () {
-    var scope;
-
-    beforeEach(function(){
-      scope = new Scope();
-    });
 
     it('executes $apply\'ed function and starts the digest', function () {
       scope.aValue = 'someValue';
@@ -293,11 +283,6 @@ describe('Scope', function(){
   });
 
   describe('evalAsync', function () {
-    var scope;
-
-    beforeEach(function(){
-      scope = new Scope();
-    });
 
     it('executes $evalAsynced function later in the same cycle', function () {
       scope.aValue = [1,2,3];
