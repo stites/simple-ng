@@ -358,9 +358,7 @@ describe('Scope', function(){
 
       expect(function(){ scope.$digest(); }).toThrow();
     });
-  });
 
-  describe('phase', function () {
     it('has a $$phase field whose value is the current digest phase', function () {
       scope.aValue = [1,2,3];
       scope.phaseInWatchFunction = undefined;
@@ -386,5 +384,6 @@ describe('Scope', function(){
       expect(scope.phaseInApplyFunction).toBe('$apply');
     });
   });
+
 
 });
