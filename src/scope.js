@@ -144,8 +144,5 @@ Scope.prototype.$$postDigest = function(fn) {
 };
 
 Scope.prototype.$new = function() {
-  var ChildScope = function(){};
-  ChildScope.prototype = this;
-  var child = new ChildScope();
-  return child;
+  return Object.create(this);
 };
