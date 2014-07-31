@@ -703,7 +703,19 @@ describe('Scope', function(){
 
     describe('shadowing', function () {
       it('shadows a parent\'s property with the same name', function () {
+        parent.name = 'Joe';
+        child.name = 'Jill';
 
+        expect(child.name).toBe('Jill');
+        expect(parent.name).toBe('Joe');
+      });
+
+      it('does not shadow members of the parent scope\'s attributes', function () {
+        parent.user = {name: 'Joe'};
+        child.user.name = 'Jill';
+
+        expect(child.user.name).toBe('Jill');
+        expect(parent.user.name).toBe('Jill');
       });
     });
 
