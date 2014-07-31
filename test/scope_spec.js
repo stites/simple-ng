@@ -653,6 +653,16 @@ describe('Scope', function(){
       expect(child.aValue).toEqual([1,2,3]);
     });
 
+    it('can manipulate a parent scope\'s property' , function () {
+      var child = parent.$new();
+      parent.aValue = [1,2,3];
+
+      child.aValue.push(4);
+
+      expect(child.aValue).toEqual([1,2,3,4]);
+      expect(parent.aValue).toEqual([1,2,3,4]);
+    });
+
   });
 
 });
