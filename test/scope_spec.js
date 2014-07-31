@@ -663,6 +663,27 @@ describe('Scope', function(){
       expect(parent.aValue).toEqual([1,2,3,4]);
     });
 
+    it('can watch a property in the parent', function () {
+      var child = parent.$new();
+      parent.aValue = [1,2,3];
+      child.counter = 0;
+
+      child.$watch(
+        function(scope){ return scope.aValue; },
+        function(newValue, oldValue, scope){
+          scope.counter++;
+        },
+        true
+      );
+
+      child.$digest();
+      expect(child.counter).toBe(1);
+
+      parent.aValue.push(4);
+      child.$digest();
+      expect(child.counter).toBe(2);
+    });
+
   });
 
 });
