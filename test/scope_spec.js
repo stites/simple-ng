@@ -646,6 +646,13 @@ describe('Scope', function(){
       expect(parent.aValue).toBeUndefined();
     });
 
+    it('inherits the parent\'s propesties whenever they are defined', function () {
+      var child = parent.$new();
+
+      parent.aValue = [1,2,3];
+      expect(child.aValue).toEqual([1,2,3]);
+    });
+
   });
 
 });
