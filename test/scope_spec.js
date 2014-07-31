@@ -16,579 +16,603 @@ describe('Scope', function(){
     expect(scope.aProperty).toBe(1);
   });
 
-  describe('digest', function(){
+  describe('digest loop', function () {
+    describe('digest', function(){
 
-    it('calls the listener function of a watch on first $digest', function(){
-      var watchFn = function(){ return 'wat'; };
-      var listenerFn = jasmine.createSpy();
-      scope.$watch(watchFn, listenerFn);
+      it('calls the listener function of a watch on first $digest', function(){
+        var watchFn = function(){ return 'wat'; };
+        var listenerFn = jasmine.createSpy();
+        scope.$watch(watchFn, listenerFn);
 
-      scope.$digest();
+        scope.$digest();
 
-      expect(listenerFn).toHaveBeenCalled();
-    });
+        expect(listenerFn).toHaveBeenCalled();
+      });
 
-    it('calls the watch function with the scope as the argument', function(){
-      var watchFn    = jasmine.createSpy();
-      var listenerFn = function(){};
-      scope.$watch(watchFn, listenerFn);
+      it('calls the watch function with the scope as the argument', function(){
+        var watchFn    = jasmine.createSpy();
+        var listenerFn = function(){};
+        scope.$watch(watchFn, listenerFn);
 
-      scope.$digest();
+        scope.$digest();
 
-      expect(watchFn).toHaveBeenCalledWith(scope);
-    });
+        expect(watchFn).toHaveBeenCalledWith(scope);
+      });
 
-    it('calls the listener function when the watched value changes', function(){
-      scope.someValue = 'a';
-      scope.counter = 0;
+      it('calls the listener function when the watched value changes', function(){
+        scope.someValue = 'a';
+        scope.counter = 0;
 
-      scope.$watch(
-        function(scope) {return scope.someValue;},
-        function(newValue, oldValue, scope) {scope.counter++;}
-      );
-
-      expect(scope.counter).toBe(0);
-
-      scope.$digest();
-      expect(scope.counter).toBe(1);
-      scope.$digest();
-      expect(scope.counter).toBe(1);
-
-      scope.someValue = 'b';
-      expect(scope.counter).toBe(1);
-
-      scope.$digest();
-      expect(scope.counter).toBe(2);
-
-      scope.someValue = 'a';
-      expect(scope.counter).toBe(2);
-
-      scope.$digest();
-      expect(scope.counter).toBe(3);
-    });
-
-    it('calls listener when watch value is first undefined', function(){
-      scope.counter = 0;
-      scope.$watch(
-        function(scope){ return scope.someValue; },
-        function(newValue, oldValue, scope){ scope.counter++; }
-      );
-
-      scope.$digest();
-      expect(scope.counter).toBe(1);
-    });
-
-    it('calls listener with new value as old value the first time', function(){
-      scope.someValue = 123;
-      var oldValueGiven;
-
-      scope.$watch(
-        function(scope){ return scope.someValue; },
-        function(newValue, oldValue, scope){ oldValueGiven = oldValue; }
-      );
-
-      scope.$digest();
-      expect(oldValueGiven).toBe(123);
-    });
-
-    it('may have watchers that omit the listener function', function () {
-      var watchFn = jasmine.createSpy().and.returnValue('something');
-      scope.$watch(watchFn);
-
-      scope.$digest();
-
-      expect(watchFn).toHaveBeenCalled();
-    });
-
-    it('triggers chained watchers in the same digest', function () {
-      scope.name = 'Jane';
-
-      // if these watchers where in the opposite order,
-      // the test would pass regardless of chaining.
-      scope.$watch(
-        function(scope) {return scope.nameUpper; },
-        function(newValue, oldValue, scope){
-          if (newValue) {
-            scope.initial = newValue.substring(0,1) + '.';
-          }
-        }
-      );
-
-      scope.$watch(
-        function(scope){ return scope.name; },
-        function(newValue, oldValue, scope) {
-          if (newValue) {
-            scope.nameUpper = newValue.toUpperCase();
-          }
-        }
-      );
-
-      scope.$digest();
-      expect(scope.nameUpper).toBe('JANE');
-      expect(scope.initial).toBe('J.');
-
-      scope.name = 'Bob';
-      scope.$digest();
-      expect(scope.nameUpper).toBe('BOB');
-      expect(scope.initial).toBe('B.');
-    });
-
-    it('gives up on the watcher after 10 iterations', function () {
-      scope.counterA = 0;
-      scope.counterB = 0;
-
-      scope.$watch(
-        function(scope) { return scope.counterA; },
-        function(newValue, oldValue, scope) {
-          scope.counterB++;
-        }
-      );
-
-      scope.$watch(
-        function(scope) { return scope.counterB; },
-        function(newValue, oldValue, scope) {
-          scope.counterA++;
-        }
-      );
-
-      expect((function(){ scope.$digest(); })).toThrow();
-    });
-
-    it('ends the digest when the last watch is clean', function () {
-      scope.array = _.range(100);
-      var watchExecutions = 0;
-
-      _.times(100, function(i){
         scope.$watch(
-          function(scope){
-            watchExecutions++;
-            return scope.array[i];
-          },
+          function(scope) {return scope.someValue;},
+          function(newValue, oldValue, scope) {scope.counter++;}
+        );
+
+        expect(scope.counter).toBe(0);
+
+        scope.$digest();
+        expect(scope.counter).toBe(1);
+        scope.$digest();
+        expect(scope.counter).toBe(1);
+
+        scope.someValue = 'b';
+        expect(scope.counter).toBe(1);
+
+        scope.$digest();
+        expect(scope.counter).toBe(2);
+
+        scope.someValue = 'a';
+        expect(scope.counter).toBe(2);
+
+        scope.$digest();
+        expect(scope.counter).toBe(3);
+      });
+
+      it('calls listener when watch value is first undefined', function(){
+        scope.counter = 0;
+        scope.$watch(
+          function(scope){ return scope.someValue; },
+          function(newValue, oldValue, scope){ scope.counter++; }
+        );
+
+        scope.$digest();
+        expect(scope.counter).toBe(1);
+      });
+
+      it('calls listener with new value as old value the first time', function(){
+        scope.someValue = 123;
+        var oldValueGiven;
+
+        scope.$watch(
+          function(scope){ return scope.someValue; },
+          function(newValue, oldValue, scope){ oldValueGiven = oldValue; }
+        );
+
+        scope.$digest();
+        expect(oldValueGiven).toBe(123);
+      });
+
+      it('may have watchers that omit the listener function', function () {
+        var watchFn = jasmine.createSpy().and.returnValue('something');
+        scope.$watch(watchFn);
+
+        scope.$digest();
+
+        expect(watchFn).toHaveBeenCalled();
+      });
+
+      it('triggers chained watchers in the same digest', function () {
+        scope.name = 'Jane';
+
+        // if these watchers where in the opposite order,
+        // the test would pass regardless of chaining.
+        scope.$watch(
+          function(scope) {return scope.nameUpper; },
           function(newValue, oldValue, scope){
+            if (newValue) {
+              scope.initial = newValue.substring(0,1) + '.';
+            }
           }
         );
+
+        scope.$watch(
+          function(scope){ return scope.name; },
+          function(newValue, oldValue, scope) {
+            if (newValue) {
+              scope.nameUpper = newValue.toUpperCase();
+            }
+          }
+        );
+
+        scope.$digest();
+        expect(scope.nameUpper).toBe('JANE');
+        expect(scope.initial).toBe('J.');
+
+        scope.name = 'Bob';
+        scope.$digest();
+        expect(scope.nameUpper).toBe('BOB');
+        expect(scope.initial).toBe('B.');
       });
 
-      scope.$digest();
-      expect(watchExecutions).toBe(200);
+      it('gives up on the watcher after 10 iterations', function () {
+        scope.counterA = 0;
+        scope.counterB = 0;
 
-      scope.array[0] = 420;
-      scope.$digest();
-      expect(watchExecutions).toBe(301);
-    });
+        scope.$watch(
+          function(scope) { return scope.counterA; },
+          function(newValue, oldValue, scope) {
+            scope.counterB++;
+          }
+        );
 
-    it('runs any new watches before ending the digest loop', function () {
+        scope.$watch(
+          function(scope) { return scope.counterB; },
+          function(newValue, oldValue, scope) {
+            scope.counterA++;
+          }
+        );
 
-      scope.aValue = 'abc';
-      scope.counter = 0;
+        expect((function(){ scope.$digest(); })).toThrow();
+      });
 
-      scope.$watch(
-        function(scope){ return scope.aValue; },
-        function(newValue, oldValue, scope){
+      it('ends the digest when the last watch is clean', function () {
+        scope.array = _.range(100);
+        var watchExecutions = 0;
+
+        _.times(100, function(i){
           scope.$watch(
-            function(scope){ return scope.aValue; },
+            function(scope){
+              watchExecutions++;
+              return scope.array[i];
+            },
             function(newValue, oldValue, scope){
-              scope.counter++;
             }
           );
-        }
-      );
-      scope.$digest();
-      expect(scope.counter).toBe(1);
-    });
+        });
 
-    it('compares based on value, if enabled', function () {
-      scope.aValue = [1,2,3];
-      scope.counter = 0;
+        scope.$digest();
+        expect(watchExecutions).toBe(200);
 
-      scope.$watch(
-        function(scope){ return scope.aValue; },
-        function(newValue, oldValue, scope){
-          scope.counter++;
-        },
-        true
-      );
-
-      scope.$digest();
-      expect(scope.counter).toBe(1);
-
-      scope.aValue.push(4);
-      scope.$digest();
-      expect(scope.counter).toBe(2);
-    });
-
-    it('correctly handles NaNs', function () {
-      scope.number = 0/0; // NaN
-      scope.counter = 0;
-
-      scope.$watch(
-        function(scope){ return scope.number; },
-        function(newValue, oldValue, scope) {
-          scope.counter++;
-        }
-      );
-
-      scope.$digest();
-      expect(scope.counter).toBe(1);
-
-      scope.$digest();
-      expect(scope.counter).toBe(1);
-    });
-  });
-
-  describe('eval', function () {
-
-    it('executes $eval\'ed function and returns result', function () {
-      scope.aValue = 42;
-
-      var result = scope.$eval(function(scope){
-        return scope.aValue;
+        scope.array[0] = 420;
+        scope.$digest();
+        expect(watchExecutions).toBe(301);
       });
 
-      expect(result).toBe(42);
-    });
+      it('runs any new watches before ending the digest loop', function () {
 
-    it('passes the second $eval argument straight through', function () {
-      scope.aValue = 42;
+        scope.aValue = 'abc';
+        scope.counter = 0;
 
-      var result = scope.$eval(function(scope, arg){
-        return scope.aValue + arg;
-      }, 2);
-
-      expect(result).toBe(44);
-    });
-  });
-
-  describe('apply', function () {
-
-    it('executes $apply\'ed function and starts the digest', function () {
-      scope.aValue = 'someValue';
-      scope.counter = 0;
-
-      scope.$watch(
-        function(scope){ return scope.aValue; },
-        function(newValue, oldValue, scope) {
-          scope.counter++;
-        }
-      );
-
-      scope.$digest();
-      expect(scope.counter).toBe(1);
-
-      scope.$apply(function(scope){
-        scope.aValue = 'someOtherValue';
+        scope.$watch(
+          function(scope){ return scope.aValue; },
+          function(newValue, oldValue, scope){
+            scope.$watch(
+              function(scope){ return scope.aValue; },
+              function(newValue, oldValue, scope){
+                scope.counter++;
+              }
+            );
+          }
+        );
+        scope.$digest();
+        expect(scope.counter).toBe(1);
       });
-      expect(scope.counter).toBe(2);
+
+      it('compares based on value, if enabled', function () {
+        scope.aValue = [1,2,3];
+        scope.counter = 0;
+
+        scope.$watch(
+          function(scope){ return scope.aValue; },
+          function(newValue, oldValue, scope){
+            scope.counter++;
+          },
+          true
+        );
+
+        scope.$digest();
+        expect(scope.counter).toBe(1);
+
+        scope.aValue.push(4);
+        scope.$digest();
+        expect(scope.counter).toBe(2);
+      });
+
+      it('correctly handles NaNs', function () {
+        scope.number = 0/0; // NaN
+        scope.counter = 0;
+
+        scope.$watch(
+          function(scope){ return scope.number; },
+          function(newValue, oldValue, scope) {
+            scope.counter++;
+          }
+        );
+
+        scope.$digest();
+        expect(scope.counter).toBe(1);
+
+        scope.$digest();
+        expect(scope.counter).toBe(1);
+      });
     });
-  });
 
-  describe('evalAsync', function () {
+    describe('eval', function () {
 
-    it('executes $evalAsynced function later in the same cycle', function () {
-      scope.aValue = [1,2,3];
-      scope.asyncEvaluated = false;
-      scope.asyncEvaluatedImmediately = false;
+      it('executes $eval\'ed function and returns result', function () {
+        scope.aValue = 42;
 
-      scope.$watch(
-        function(scope){ return scope.aValue; },
-        function(newValue, oldValue, scope){
-          scope.$evalAsync(function(scope){
-            scope.asyncEvaluated = true;
-          });
-          scope.asyncEvaluatedImmediately = scope.asyncEvaluated;
-        }
-      );
+        var result = scope.$eval(function(scope){
+          return scope.aValue;
+        });
 
-      scope.$digest();
-      expect(scope.asyncEvaluated).toBe(true);
-      expect(scope.asyncEvaluatedImmediately).toBe(false);
+        expect(result).toBe(42);
+      });
+
+      it('passes the second $eval argument straight through', function () {
+        scope.aValue = 42;
+
+        var result = scope.$eval(function(scope, arg){
+          return scope.aValue + arg;
+        }, 2);
+
+        expect(result).toBe(44);
+      });
     });
 
-    it('executes $evalAsynced functions added by watch functions', function () {
-      scope.aValue = [1,2,3];
-      scope.asyncEvaluated = false;
+    describe('apply', function () {
 
-      scope.$watch(
-        function(scope){
-          if (!scope.asyncEvaluated) {
+      it('executes $apply\'ed function and starts the digest', function () {
+        scope.aValue = 'someValue';
+        scope.counter = 0;
+
+        scope.$watch(
+          function(scope){ return scope.aValue; },
+          function(newValue, oldValue, scope) {
+            scope.counter++;
+          }
+        );
+
+        scope.$digest();
+        expect(scope.counter).toBe(1);
+
+        scope.$apply(function(scope){
+          scope.aValue = 'someOtherValue';
+        });
+        expect(scope.counter).toBe(2);
+      });
+    });
+
+    describe('evalAsync', function () {
+
+      it('executes $evalAsynced function later in the same cycle', function () {
+        scope.aValue = [1,2,3];
+        scope.asyncEvaluated = false;
+        scope.asyncEvaluatedImmediately = false;
+
+        scope.$watch(
+          function(scope){ return scope.aValue; },
+          function(newValue, oldValue, scope){
             scope.$evalAsync(function(scope){
               scope.asyncEvaluated = true;
             });
+            scope.asyncEvaluatedImmediately = scope.asyncEvaluated;
           }
-          return scope.aValue;
-        },
-        function(newValue, oldValue, scope) {}
-      );
+        );
 
-      scope.$digest();
-
-      expect(scope.asyncEvaluated).toBe(true);
-    });
-
-    it('executes $evalAsynced functions even when not dirty', function () {
-      scope.aValue = [1,2,3];
-      scope.asyncEvaluatedTimes = 0;
-
-      scope.$watch(
-        function(scope) {
-          if (scope.asyncEvaluatedTimes < 2) {
-            scope.$evalAsync(function(scope) {
-              scope.asyncEvaluatedTimes++;
-            });
-          }
-          return scope.aValue;
-        },
-        function(newValue, oldValue, scope) {}
-      );
-
-      scope.$digest();
-      expect(scope.asyncEvaluatedTimes).toBe(2);
-    });
-
-    it('eventually halts $evalAsync added by watches', function () {
-      scope.aValue = [1,2,3];
-
-      scope.$watch(
-        function(scope){
-          scope.$evalAsync(function(scope){});
-          return scope.aValue;
-        },
-        function(newValue, oldValue, scope) {}
-      );
-
-      expect(function(){ scope.$digest(); }).toThrow();
-    });
-
-    it('has a $$phase field whose value is the current digest phase', function () {
-      scope.aValue = [1,2,3];
-      scope.phaseInWatchFunction = undefined;
-      scope.phaseInListenerFunction = undefined;
-      scope.phaseInApplyFunction = undefined;
-
-      scope.$watch(
-        function(scope){
-          scope.phaseInWatchFunction = scope.$$phase;
-          return scope.aValue;
-        },
-        function(newValue, oldValue, scope){
-          scope.phaseInListenerFunction = scope.$$phase;
-        }
-      );
-
-      scope.$apply(function(scope) {
-        scope.phaseInApplyFunction = scope.$$phase;
+        scope.$digest();
+        expect(scope.asyncEvaluated).toBe(true);
+        expect(scope.asyncEvaluatedImmediately).toBe(false);
       });
 
-      expect(scope.phaseInWatchFunction).toBe('$digest');
-      expect(scope.phaseInListenerFunction).toBe('$digest');
-      expect(scope.phaseInApplyFunction).toBe('$apply');
+      it('executes $evalAsynced functions added by watch functions', function () {
+        scope.aValue = [1,2,3];
+        scope.asyncEvaluated = false;
+
+        scope.$watch(
+          function(scope){
+            if (!scope.asyncEvaluated) {
+              scope.$evalAsync(function(scope){
+                scope.asyncEvaluated = true;
+              });
+            }
+            return scope.aValue;
+          },
+          function(newValue, oldValue, scope) {}
+        );
+
+        scope.$digest();
+
+        expect(scope.asyncEvaluated).toBe(true);
+      });
+
+      it('executes $evalAsynced functions even when not dirty', function () {
+        scope.aValue = [1,2,3];
+        scope.asyncEvaluatedTimes = 0;
+
+        scope.$watch(
+          function(scope) {
+            if (scope.asyncEvaluatedTimes < 2) {
+              scope.$evalAsync(function(scope) {
+                scope.asyncEvaluatedTimes++;
+              });
+            }
+            return scope.aValue;
+          },
+          function(newValue, oldValue, scope) {}
+        );
+
+        scope.$digest();
+        expect(scope.asyncEvaluatedTimes).toBe(2);
+      });
+
+      it('eventually halts $evalAsync added by watches', function () {
+        scope.aValue = [1,2,3];
+
+        scope.$watch(
+          function(scope){
+            scope.$evalAsync(function(scope){});
+            return scope.aValue;
+          },
+          function(newValue, oldValue, scope) {}
+        );
+
+        expect(function(){ scope.$digest(); }).toThrow();
+      });
+
+      it('has a $$phase field whose value is the current digest phase', function () {
+        scope.aValue = [1,2,3];
+        scope.phaseInWatchFunction = undefined;
+        scope.phaseInListenerFunction = undefined;
+        scope.phaseInApplyFunction = undefined;
+
+        scope.$watch(
+          function(scope){
+            scope.phaseInWatchFunction = scope.$$phase;
+            return scope.aValue;
+          },
+          function(newValue, oldValue, scope){
+            scope.phaseInListenerFunction = scope.$$phase;
+          }
+        );
+
+        scope.$apply(function(scope) {
+          scope.phaseInApplyFunction = scope.$$phase;
+        });
+
+        expect(scope.phaseInWatchFunction).toBe('$digest');
+        expect(scope.phaseInListenerFunction).toBe('$digest');
+        expect(scope.phaseInApplyFunction).toBe('$apply');
+      });
+
+      it('schedules a digest in $evalAsync', function (done) {
+        scope.aValue = 'abc';
+        scope.counter = 0;
+
+        scope.$watch(
+          function(scope){ return scope.aValue; },
+          function(newValue, oldValue, scope){
+            scope.counter++;
+          }
+        );
+        scope.$evalAsync(function(scope){});
+
+        expect(scope.counter).toBe(0);
+        setTimeout(function(){
+          expect(scope.counter).toBe(1);
+          done();
+        }, 50);
+      });
     });
 
-    it('schedules a digest in $evalAsync', function (done) {
-      scope.aValue = 'abc';
-      scope.counter = 0;
+    describe('postDigest', function() {
+      it('runs a $$postDigest function after each digest', function () {
+        scope.counter = 0;
 
-      scope.$watch(
-        function(scope){ return scope.aValue; },
-        function(newValue, oldValue, scope){
+        scope.$$postDigest(function(){
           scope.counter++;
-        }
-      );
-      scope.$evalAsync(function(scope){});
+        });
 
-      expect(scope.counter).toBe(0);
-      setTimeout(function(){
+        expect(scope.counter).toBe(0);
+
+        scope.$digest();
         expect(scope.counter).toBe(1);
-        done();
-      }, 50);
-    });
-  });
 
-  describe('postDigest', function() {
-    it('runs a $$postDigest function after each digest', function () {
-      scope.counter = 0;
-
-      scope.$$postDigest(function(){
-        scope.counter++;
+        scope.$digest();
+        expect(scope.counter).toBe(1);
       });
 
-      expect(scope.counter).toBe(0);
+      it('does not include $$postDigest in the digest', function () {
+        scope.aValue = 'original value';
 
-      scope.$digest();
-      expect(scope.counter).toBe(1);
+        scope.$$postDigest(function(){
+          scope.aValue = 'changed value';
+        });
 
-      scope.$digest();
-      expect(scope.counter).toBe(1);
+        scope.$watch(
+          function(scope){ return scope.aValue; },
+          function(newValue, oldValue, scope){
+            scope.watchedValue = newValue;
+          }
+        );
+
+        scope.$digest();
+        expect(scope.watchedValue).toBe('original value');
+
+        scope.$digest();
+        expect(scope.watchedValue).toBe('changed value');
+      });
     });
 
-    it('does not include $$postDigest in the digest', function () {
-      scope.aValue = 'original value';
+    describe('exceptions', function () {
+      it('catches exceptions in watch functions and continues', function () {
+        scope.aValue = 'abc';
+        scope.counter = 0;
 
-      scope.$$postDigest(function(){
-        scope.aValue = 'changed value';
+        scope.$watch(
+          function(scope){ throw 'error'; },
+          function(newValue, oldValue, scope){ }
+        );
+
+        scope.$watch(
+          function(scope){ return scope.aValue; },
+          function(newValue, oldValue, scope){
+            scope.counter++;
+          }
+        );
+
+        scope.$digest();
+        expect(scope.counter).toBe(1);
       });
 
-      scope.$watch(
-        function(scope){ return scope.aValue; },
-        function(newValue, oldValue, scope){
-          scope.watchedValue = newValue;
-        }
-      );
+      it('catches exceptions in listener functions and continues', function () {
+        scope.aValue = 'abc';
+        scope.counter = 0;
 
-      scope.$digest();
-      expect(scope.watchedValue).toBe('original value');
+        scope.$watch(
+          function(scope){ return scope.aValue; },
+          function(newValue, oldValue, scope) {
+            throw 'error';
+          }
+        );
 
-      scope.$digest();
-      expect(scope.watchedValue).toBe('changed value');
-    });
-  });
+        scope.$watch(
+          function(scope){ return scope.aValue; },
+          function(newValue, oldValue, scope) {
+            scope.counter++;
+          }
+        );
 
-  describe('exceptions', function () {
-    it('catches exceptions in watch functions and continues', function () {
-      scope.aValue = 'abc';
-      scope.counter = 0;
+        scope.$digest();
+        expect(scope.counter).toBe(1);
+      });
 
-      scope.$watch(
-        function(scope){ throw 'error'; },
-        function(newValue, oldValue, scope){ }
-      );
+      it('catches exceptions in $evalAsync', function(done){
+        scope.aValue = 'abc';
+        scope.counter = 0;
 
-      scope.$watch(
-        function(scope){ return scope.aValue; },
-        function(newValue, oldValue, scope){
-          scope.counter++;
-        }
-      );
+        scope.$watch(
+          function(scope){ return scope.aValue; },
+          function(newValue, oldValue, scope) {
+            scope.counter++;
+          }
+        );
 
-      scope.$digest();
-      expect(scope.counter).toBe(1);
-    });
-
-    it('catches exceptions in listener functions and continues', function () {
-      scope.aValue = 'abc';
-      scope.counter = 0;
-
-      scope.$watch(
-        function(scope){ return scope.aValue; },
-        function(newValue, oldValue, scope) {
+        scope.$evalAsync(function(scope){
           throw 'error';
-        }
-      );
+        });
 
-      scope.$watch(
-        function(scope){ return scope.aValue; },
-        function(newValue, oldValue, scope) {
-          scope.counter++;
-        }
-      );
-
-      scope.$digest();
-      expect(scope.counter).toBe(1);
-    });
-
-    it('catches exceptions in $evalAsync', function(done){
-      scope.aValue = 'abc';
-      scope.counter = 0;
-
-      scope.$watch(
-        function(scope){ return scope.aValue; },
-        function(newValue, oldValue, scope) {
-          scope.counter++;
-        }
-      );
-
-      scope.$evalAsync(function(scope){
-        throw 'error';
+        setTimeout(function(){
+          expect(scope.counter).toBe(1);
+          done();
+        }, 50);
       });
 
-      setTimeout(function(){
+      it('catches exceptions in $$postDigest', function () {
+        var didRun = false;
+
+        scope.$$postDigest(function(){
+          throw 'error';
+        });
+        scope.$$postDigest(function(){
+          didRun = true;
+        });
+
+        scope.$digest();
+        expect(didRun).toBe(true);
+      });
+    });
+
+    describe('destroying a watch', function() {
+      it('allows destroying a $watch with a removal function', function () {
+        scope.aValue = 'abc';
+        scope.counter = 0;
+
+        var destroyWatch = scope.$watch(
+          function(scope){ return scope.aValue; },
+          function(newValue, oldValue, scope){
+            scope.counter++;
+          }
+        );
+
+        scope.$digest();
         expect(scope.counter).toBe(1);
-        done();
-      }, 50);
-    });
 
-    it('catches exceptions in $$postDigest', function () {
-      var didRun = false;
+        scope.aValue = 'def';
+        scope.$digest();
+        expect(scope.counter).toBe(2);
 
-      scope.$$postDigest(function(){
-        throw 'error';
-      });
-      scope.$$postDigest(function(){
-        didRun = true;
+        scope.aValue = 'ghi';
+        destroyWatch();
+        scope.$digest();
+        expect(scope.counter).toBe(2);
       });
 
-      scope.$digest();
-      expect(didRun).toBe(true);
-    });
-  });
+      it('allows destroying a $watch during a digest', function () {
+        scope.aValue = 'abc';
+        var watchCalls = [];
 
-  describe('destroying a watch', function() {
-    it('allows destroying a $watch with a removal function', function () {
+        scope.$watch(
+          function(scope){
+            watchCalls.push('first');
+            return scope.aValue;
+          }
+        );
+        var destroyWatch = scope.$watch(
+          function(scope) {
+            watchCalls.push('second');
+            destroyWatch();
+          }
+        );
+        scope.$watch(
+          function(scope){
+            watchCalls.push('third');
+            return scope.aValue;
+          }
+        );
+
+        scope.$digest();
+        expect(watchCalls).toEqual(['first', 'second', 'third', 'first', 'third']);
+      });
+
+      it('allows a $watch to destroy another during digest', function () {
+        scope.aValue = 'abc';
+        scope.counter = 0;
+
+        scope.$watch(
+          function(scope){ return scope.aValue; },
+          function(newValue, oldValue, scope) {
+            destroyWatch();
+          }
+        );
+        var destroyWatch = scope.$watch(
+          function(scope){},
+          function(newValue, oldValue, scope) {}
+        );
+        scope.$watch(
+          function(scope){ return scope.aValue; },
+          function(newValue, oldValue, scope) {
+            scope.counter++;
+          }
+        );
+
+        scope.$digest();
+        expect(scope.counter).toBe(1);
+      });
+    });
+
+    it('allows destroying several $watches during digest', function () {
       scope.aValue = 'abc';
       scope.counter = 0;
 
-      var destroyWatch = scope.$watch(
-        function(scope){ return scope.aValue; },
-        function(newValue, oldValue, scope){
-          scope.counter++;
-        }
-      );
-
-      scope.$digest();
-      expect(scope.counter).toBe(1);
-
-      scope.aValue = 'def';
-      scope.$digest();
-      expect(scope.counter).toBe(2);
-
-      scope.aValue = 'ghi';
-      destroyWatch();
-      scope.$digest();
-      expect(scope.counter).toBe(2);
-    });
-
-    it('allows destroying a $watch during a digest', function () {
-      scope.aValue = 'abc';
-      var watchCalls = [];
-
-      scope.$watch(
-        function(scope){
-          watchCalls.push('first');
-          return scope.aValue;
-        }
-      );
-      var destroyWatch = scope.$watch(
+      var destroyWatch1 = scope.$watch(
         function(scope) {
-          watchCalls.push('second');
-          destroyWatch();
-        }
-      );
-      scope.$watch(
-        function(scope){
-          watchCalls.push('third');
-          return scope.aValue;
+          destroyWatch1();
+          destroyWatch2();
         }
       );
 
-      scope.$digest();
-      expect(watchCalls).toEqual(['first', 'second', 'third', 'first', 'third']);
-    });
-
-    it('allows a $watch to destroy another during digest', function () {
-      scope.aValue = 'abc';
-      scope.counter = 0;
-
-      scope.$watch(
-        function(scope){ return scope.aValue; },
-        function(newValue, oldValue, scope) {
-          destroyWatch();
-        }
-      );
-      var destroyWatch = scope.$watch(
-        function(scope){},
-        function(newValue, oldValue, scope) {}
-      );
-      scope.$watch(
+      var destroyWatch2 = scope.$watch(
         function(scope){ return scope.aValue; },
         function(newValue, oldValue, scope) {
           scope.counter++;
@@ -596,30 +620,32 @@ describe('Scope', function(){
       );
 
       scope.$digest();
-      expect(scope.counter).toBe(1);
+      expect(scope.counter).toBe(0);
     });
   });
 
-  it('allows destroying several $watches during digest', function () {
-    scope.aValue = 'abc';
-    scope.counter = 0;
+  describe('inheritance', function () {
+    var parent;
 
-    var destroyWatch1 = scope.$watch(
-      function(scope) {
-        destroyWatch1();
-        destroyWatch2();
-      }
-    );
+    beforeEach(function () {
+      parent = new Scope();
+    });
 
-    var destroyWatch2 = scope.$watch(
-      function(scope){ return scope.aValue; },
-      function(newValue, oldValue, scope) {
-        scope.counter++;
-      }
-    );
+    it('inherits the parent\'s properties', function () {
+      parent.aValue = [1,2,3];
 
-    scope.$digest();
-    expect(scope.counter).toBe(0);
+      var child = parent.$new();
+
+      expect(child.aValue).toEqual([1,2,3]);
+    });
+
+    it('does not cause a parent to inherit its properties', function () {
+      child = parent.$new();
+      child.aValue = [1,2,3];
+
+      expect(parent.aValue).toBeUndefined();
+    });
+
   });
 
 });
