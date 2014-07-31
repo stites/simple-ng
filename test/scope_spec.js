@@ -640,7 +640,7 @@ describe('Scope', function(){
     });
 
     it('does not cause a parent to inherit its properties', function () {
-      child = parent.$new();
+      var child = parent.$new();
       child.aValue = [1,2,3];
 
       expect(parent.aValue).toBeUndefined();

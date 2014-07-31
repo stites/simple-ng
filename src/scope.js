@@ -142,3 +142,10 @@ Scope.prototype.$clearPhase = function(){
 Scope.prototype.$$postDigest = function(fn) {
   this.$$postDigestQueue.push(fn);
 };
+
+Scope.prototype.$new = function() {
+  var ChildScope = function(){};
+  ChildScope.prototype = this;
+  var child = new ChildScope();
+  return child;
+};
