@@ -684,6 +684,28 @@ describe('Scope', function(){
       expect(child.counter).toBe(2);
     });
 
+    it('can be nested at any depth', function () {
+      var a   = new Scope();
+      var aa  = a.$new();
+      var aaa = aa.$new();
+      var aab = aa.$new();
+      var ab  = a.$new();
+      var abb = ab.$new();
+
+      a.value = 1;
+
+      expect(aa.value).toBe(1);
+      expect(aaa.value).toBe(1);
+      expect(aab.value).toBe(1);
+      expect(ab.value).toBe(1);
+      expect(abb.value).toBe(1);
+
+      ab.anotherValue = 2;
+      expect(abb.anotherValue).toBe(2);
+      expect(aa.anotherValue).toBeUndefined();
+      expect(aaa.anotherValue).toBeUndefined();
+    });
+
   });
 
 });
