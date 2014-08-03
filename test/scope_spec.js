@@ -748,6 +748,19 @@ describe('Scope', function(){
         expect(child2.$$children.length).toBe(1);
         expect(child2.$$children[0]).toBe(child2_1);
       });
+
+      it('digests its children', function () {
+        parent.aValue = 'abc';
+        child.$watch(
+          function(scope){return scope.aValue; },
+          function(newValue, oldValue, scope){
+            scope.aValueWas = newValue;
+          }
+        );
+
+        parent.$digest();
+        expect(child.aValueWas).toBe('abc');
+      });
     });
 
   });
