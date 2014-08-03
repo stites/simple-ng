@@ -719,6 +719,22 @@ describe('Scope', function(){
       });
     });
 
+    describe('separated watches', function () {
+      it('does not digest its parent(s)', function () {
+        parent.aValue = 'abc';
+        parent.$watch(
+          function(scope){ return scope.aValue; },
+          function(newValue, oldValue, scope){
+            scope.aValueWas = newValue;
+          }
+        );
+        child.$digest();
+        expect(child.aValueWas).toBeUndefined();
+      });
+
+
+    });
+
   });
 
 });
