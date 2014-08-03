@@ -8,6 +8,7 @@ function Scope() {
   this.$$lastDirtyWatch = null;
   this.$$asyncQueue = [];
   this.$$phase = null;
+  this.$$children = [];
   this.$$postDigestQueue = [];
 }
 
@@ -147,6 +148,8 @@ Scope.prototype.$new = function() {
   var ChildScope = function(){};
   ChildScope.prototype = this;
   var child = new ChildScope();
+  this.$$children.push(child);
   child.$$watchers = [];
+  child.$$children= [];
   return child;
 };
