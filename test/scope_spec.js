@@ -629,7 +629,7 @@ describe('Scope', function(){
 
     beforeEach(function () {
       parent = new Scope();
-      child = parent.$new();
+      child = parent.$new(true);
     });
 
     describe('inheritance basics', function () {
@@ -796,8 +796,27 @@ describe('Scope', function(){
           done();
         }, 50);
       });
-
     });
+
+    describe('isolated scopes', function () {
+      it('does not have access to parent attributes when isolated', function () {
+        parent.aValue = 'abc';
+        expect(child.aValue).toBeUndefined();
+      });
+
+      it('cannot watch parent attributes when isolated', function () {
+        parent.aValue = 'abc';
+        child.$watch(
+          function(scope){ return scope.aValue; },
+          function(newValue, oldValue, scope){
+            scope.aValueWas = newValue;
+          }
+        );
+        child.$digest();
+        expect(child.aValueWas).toBeUndefined();
+      });
+    });
+
   });
 
 });
