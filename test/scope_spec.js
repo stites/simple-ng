@@ -629,7 +629,7 @@ describe('Scope', function(){
 
     beforeEach(function () {
       parent = new Scope();
-      child = parent.$new(true);
+      child = parent.$new();
     });
 
     describe('inheritance basics', function () {
@@ -762,6 +762,7 @@ describe('Scope', function(){
         expect(child.aValueWas).toBe('abc');
       });
     });
+
     describe('digesting from $apply and $evalAsync', function () {
       it('digests from root on $apply', function () {
         var child2 = child.$new();
@@ -799,6 +800,11 @@ describe('Scope', function(){
     });
 
     describe('isolated scopes', function () {
+      beforeEach(function () {
+        parent = new Scope();
+        child = parent.$new(true);
+      });
+
       it('does not have access to parent attributes when isolated', function () {
         parent.aValue = 'abc';
         expect(child.aValue).toBeUndefined();
