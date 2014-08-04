@@ -867,8 +867,26 @@ describe('Scope', function(){
           done();
         }, 50);
       });
-    });
 
+      it('executes $evalAsync functions on isolated scopes', function (done) {
+        child.$evalAsync(function(scope){
+          scope.didEvalAsync = true;
+        });
+
+        setTimeout(function(){
+          expect(child.didEvalAsync).toBe(true);
+          done();
+        }, 50);
+      });
+
+      it('executes $$postDigest functions on isolated scopes', function () {
+        child.$$postDigest(function(){
+          child.didPostDigest = true;
+        });
+        parent.$digest();
+        expect(child.didPostDigest).toBe(true);
+      });
+    });
   });
 
 });
