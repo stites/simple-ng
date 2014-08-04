@@ -821,6 +821,18 @@ describe('Scope', function(){
         child.$digest();
         expect(child.aValueWas).toBeUndefined();
       });
+
+      it('digests its isolated children', function () {
+        child.aValue = 'abc';
+        child.$watch(
+          function(scope){ return scope.aValue; },
+          function(newValue, oldValue, scope){
+            scope.aValueWas = newValue;
+          }
+        );
+        parent.$digest();
+        expect(child.aValueWas).toBe('abc');
+      });
     });
 
   });
