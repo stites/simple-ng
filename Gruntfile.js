@@ -24,16 +24,25 @@ module.exports = function(grunt) {
                 options: {
                     framework: 'jasmine2',
                     launch_in_dev: ['PhantomJS'],
-                    before_tests: 'grunt jshint',
+                    before_tests: 'grunt jshint && grunt notify:lint',
                     serve_files: jsFiles.concat(dependencies),
                     watch_files: jsFiles
                 }
             }
+        },
+        notify: {
+          lint: {
+            options: {
+              title: 'Simple-ng linter',
+              message: 'linting complete!'
+            }
+          }
         }
     });
 
     grunt.loadNpmTasks('grunt-contrib-jshint');
     grunt.loadNpmTasks('grunt-contrib-testem');
+    grunt.loadNpmTasks('grunt-notify');
 
     grunt.registerTask('default', ['testem:run:unit']);
 
