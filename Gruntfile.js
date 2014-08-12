@@ -34,7 +34,7 @@ module.exports = function(grunt) {
           lint: {
             options: {
               title: 'Simple-ng linter',
-              message: 'linting complete!'
+              message: 'linting complete - starting tests'
             }
           }
         }

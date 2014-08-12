@@ -4,6 +4,7 @@
   "description": "A simple implimentation of angular built from the ground-up",
   "author": "Sam Stites <sam@stites.io>",
   "devDependencies": {
+    "growl": "^1.8.1",
     "grunt": "^0.4.5",
     "grunt-contrib-jshint": "^0.10.0",
     "grunt-contrib-testem": "^0.5.16",
