@@ -26,17 +26,18 @@ module.exports = function(grunt) {
                     launch_in_dev: ['PhantomJS'],
                     before_tests: 'grunt jshint && grunt notify:lint',
                     serve_files: jsFiles.concat(dependencies),
-                    watch_files: jsFiles
+                    watch_files: jsFiles,
+                    after_tests: 'grunt notify:test'
                 }
             }
         },
         notify: {
           lint: {
-            options: {
-              title: 'Simple-ng linter',
-              message: 'linting complete - starting tests'
-            }
-          }
+            options: { message: 'linting: passed' }
+          },
+          test: {
+            options: { message: 'tests: passed'   }
+          },
         }
     });
 
