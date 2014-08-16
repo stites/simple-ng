@@ -219,6 +219,14 @@ Scope.prototype.$watchCollection = function(watchFn, listenerFn) {
           changeCount++;
           oldValue = {};
         }
+        for (var key in newValue) {
+          if (newValue.hasOwnProperty(key)) {
+            if (oldValue[key] !== newValue[key]) {
+              changeCount++;
+              oldValue[key] = newValue[key];
+            }
+          }
+        }
       }
     } else {
       if (!self.$$areEqual(newValue, oldValue, false)){
