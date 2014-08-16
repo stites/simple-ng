@@ -25,8 +25,16 @@ module.exports = function(grunt) {
                     framework: 'jasmine2',
                     launch_in_dev: ['PhantomJS'],
                     before_tests: 'grunt jshint && grunt notify:lint',
-                    serve_files: jsFiles.concat(dependencies),
-                    watch_files: jsFiles,
+                    serve_files: [
+                        'node_modules/lodash/lodash.js',
+                        'node_modules/jquery/dist/jquery.js',
+                        'src/**/*.js',
+                        'test/**/*.js'
+                    ],
+                    watch_files: [
+                        'src/**/*.js',
+                        'test/**/*.js'
+                    ],
                     after_tests: 'grunt notify:test'
                 }
             }
