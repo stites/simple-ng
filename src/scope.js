@@ -196,6 +196,7 @@ Scope.prototype.$watchCollection = function(watchFn, listenerFn) {
   var changeCount = 0;
 
   var internalWatchFn = function(scope){
+    var key;
     newValue = watchFn(scope);
 
     if (_.isObject(newValue)) {
@@ -219,12 +220,18 @@ Scope.prototype.$watchCollection = function(watchFn, listenerFn) {
           changeCount++;
           oldValue = {};
         }
-        for (var key in newValue) {
+        for (key in newValue) {
           if (newValue.hasOwnProperty(key)) {
             if (oldValue[key] !== newValue[key]) {
               changeCount++;
               oldValue[key] = newValue[key];
             }
+          }
+        }
+        for (key in oldValue) {
+          if (oldValue.hasOwnProperty(key) && !newValue.hasOwnProperty(key)) {
+            changeCount++;
+            delete oldValue[key];
           }
         }
       }
